@@ -8,3 +8,11 @@ designing a database for the AllReady service
 ```make goose-down``` - for down all migrations
 
 ```make goose-status``` - for look status of migrations
+
+
+We have some pictures 
+![img.png](img.png)
+
+And every table was created with all dependencies
+For example, table "menus"
+![img_1.png](img_1.png)
