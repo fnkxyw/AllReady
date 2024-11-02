@@ -11,8 +11,8 @@ designing a database for the AllReady service
 
 
 We have some pictures 
-![img.png](img.png)
+![img.png](docs/img.png)
 
 And every table was created with all dependencies
 For example, table "menus"
-![img_1.png](img_1.png)
+![img_1.png](docs/img_1.png)
