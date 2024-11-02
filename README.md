@@ -18,3 +18,7 @@ And every table was created with all dependencies
 For example, table "menus":
 
 ![img_1.png](docs/img_1.png)
+
+## Scheme 
+
+![img.png](docs/scheme.png)
