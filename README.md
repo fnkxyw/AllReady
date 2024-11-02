@@ -10,9 +10,11 @@ designing a database for the AllReady service
 ```make goose-status``` - for look status of migrations
 
 
-We have some pictures 
+Picture with tables:
+
 ![img.png](docs/img.png)
 
 And every table was created with all dependencies
-For example, table "menus"
+For example, table "menus":
+
 ![img_1.png](docs/img_1.png)
