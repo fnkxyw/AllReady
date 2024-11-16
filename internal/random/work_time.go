@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+//function for work hours generating
+
 func GenerateWorkHours() string {
 
 	rand.Seed(time.Now().UnixNano())

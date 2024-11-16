@@ -2,6 +2,8 @@ package models
 
 import "time"
 
+//all models for our db
+
 type User struct {
 	ID        int       `db:"id"`
 	FirstName string    `db:"first_name"`

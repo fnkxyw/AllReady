@@ -20,5 +20,6 @@ goose-down:
 goose-status:
 	goose -dir ./migrations postgres $(DSN) status
 
+# filling db with fake data
 fake-data:
 	go run cmd/faker/faker.go

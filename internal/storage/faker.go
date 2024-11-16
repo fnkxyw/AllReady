@@ -9,9 +9,14 @@ import (
 	"log"
 )
 
+//file with functions for filling tables / gofakeit
+
 const num_of_nodes = 1000
 
+//method for filling all tables in db
+
 func (s *PgRepository) FillAllTables(ctx context.Context) {
+	//simple methods for every table
 	FillTableUsers(ctx, s.pool)
 	FillTableRestaurants(ctx, s.pool)
 	FillTableReviews(ctx, s.pool)
@@ -31,7 +36,7 @@ func FillTableUsers(ctx context.Context, p *pgxpool.Pool) {
 			Telephone: gofakeit.Phone(),
 			Email:     gofakeit.Email(),
 			Password:  gofakeit.Password(true, false, false, false, false, 32),
-			DateOfReg: gofakeit.Date(),
+			DateOfReg: random.GenerateDateAfter2010(),
 		}
 		query := `
 		INSERT INTO users (id, first_name, last_name, telephone, email, password, date_of_registration)
@@ -74,7 +79,7 @@ func FillTableReviews(ctx context.Context, p *pgxpool.Pool) {
 			RID:        gofakeit.Number(1, num_of_nodes-1),
 			Rating:     gofakeit.Number(1, 5),
 			Comment:    gofakeit.Paragraph(1, 3, 10, " "),
-			ReviewDate: gofakeit.Date(),
+			ReviewDate: random.GenerateDateAfter2010(),
 		}
 		query := `
 		INSERT INTO review (id, userid, restaurantid, rating, comment, review_date)
@@ -95,7 +100,7 @@ func FillTableRTables(ctx context.Context, p *pgxpool.Pool) {
 			RID:          gofakeit.Number(1, num_of_nodes-12),
 			Seats:        gofakeit.Number(2, 10),
 			Availability: gofakeit.Bool(),
-			Location:     gofakeit.Word(),
+			Location:     random.GenerateRandomLocation(),
 		}
 
 		query := `
@@ -113,12 +118,12 @@ func FillTableOrders(ctx context.Context, p *pgxpool.Pool) {
 	for i := 0; i < num_of_nodes; i++ {
 		order := models.Order{
 			ID:          i,
-			UID:         gofakeit.Number(1, num_of_nodes-1),                                               // Случайный ID пользователя
-			RName:       gofakeit.Company(),                                                               // Случайное название ресторана
-			OrderDate:   gofakeit.Date(),                                                                  // Случайная дата
-			Status:      gofakeit.RandomString([]string{"pending", "confirmed", "completed", "canceled"}), // Случайный статус
-			TotalAmount: gofakeit.Number(20, 500),                                                         // Сумма заказа (от 20 до 500)
-			TID:         gofakeit.Number(1, num_of_nodes-1),                                               // Случайный ID стола
+			UID:         gofakeit.Number(1, num_of_nodes-1),
+			RName:       gofakeit.Company(),
+			OrderDate:   random.GenerateDateAfter2010(),
+			Status:      gofakeit.RandomString([]string{"pending", "confirmed", "completed", "canceled"}),
+			TotalAmount: gofakeit.Number(20, 500),
+			TID:         gofakeit.Number(1, num_of_nodes-1),
 		}
 		query := `
 		INSERT INTO orders (id, userid, restaurant_name, order_date_time, order_status, total_amount, tableid)
@@ -154,11 +159,11 @@ func FillTableDishes(ctx context.Context, p *pgxpool.Pool) {
 	for i := 0; i < num_of_nodes; i++ {
 		dish := models.Dish{
 			ID:           i,
-			MID:          gofakeit.Number(1, num_of_nodes-1), // Случайный ID меню
-			DishName:     gofakeit.MinecraftFood(),           // Случайное название блюда
-			DishDesc:     gofakeit.Sentence(5),               // Краткое описание блюда
-			Price:        gofakeit.Number(5, 100),            // Случайная цена от 5 до 100
-			Availability: gofakeit.Bool(),                    // Доступность блюда
+			MID:          gofakeit.Number(1, num_of_nodes-1),
+			DishName:     gofakeit.MinecraftFood(),
+			DishDesc:     gofakeit.Sentence(5),
+			Price:        gofakeit.Number(5, 100),
+			Availability: gofakeit.Bool(),
 		}
 
 		query := `
@@ -176,9 +181,9 @@ func FillTableOrderDish(ctx context.Context, p *pgxpool.Pool) {
 	for i := 0; i < num_of_nodes; i++ {
 		orderDish := models.OrderDish{
 			ID:       i,
-			OID:      gofakeit.Number(1, num_of_nodes-1), // Случайный ID заказа (ссылается на таблицу orders)
-			DID:      gofakeit.Number(1, num_of_nodes-1), // Случайный ID блюда (ссылается на таблицу dishes)
-			Quantity: gofakeit.Number(1, 5),              // Количество блюда (от 1 до 5)
+			OID:      gofakeit.Number(1, num_of_nodes-1),
+			DID:      gofakeit.Number(1, num_of_nodes-1),
+			Quantity: gofakeit.Number(1, 5),
 		}
 
 		query := `
