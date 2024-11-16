@@ -19,3 +19,6 @@ goose-down:
 # look status of migrations
 goose-status:
 	goose -dir ./migrations postgres $(DSN) status
+
+fake-data:
+	go run cmd/faker/faker.go
