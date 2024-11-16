@@ -22,3 +22,7 @@ For example, table "menus":
 ## Scheme 
 
 ![img.png](docs/scheme.png)
+
+#### To generate data for the fulfillment table 
+
+```make fake-data``` in terminal
