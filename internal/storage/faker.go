@@ -17,17 +17,19 @@ const num_of_nodes = 1000
 
 func (s *PgRepository) FillAllTables(ctx context.Context) {
 	//simple methods for every table
-	FillTableUsers(ctx, s.pool)
-	FillTableRestaurants(ctx, s.pool)
-	FillTableReviews(ctx, s.pool)
-	FillTableRTables(ctx, s.pool)
-	FillTableOrders(ctx, s.pool)
-	FillTableMenus(ctx, s.pool)
-	FillTableDishes(ctx, s.pool)
-	FillTableOrderDish(ctx, s.pool)
+	ds := models.DataSet{}
+
+	FillTableUsers(ctx, s.pool, &ds)
+	FillTableRestaurants(ctx, s.pool, &ds)
+	FillTableReviews(ctx, s.pool, &ds)
+	FillTableRTables(ctx, s.pool, &ds)
+	FillTableMenus(ctx, s.pool, &ds)
+	FillTableDishes(ctx, s.pool, &ds)
+	FillTableOrders(ctx, s.pool, &ds)
+	FillTableOrderDish(ctx, s.pool, &ds)
 }
 
-func FillTableUsers(ctx context.Context, p *pgxpool.Pool) {
+func FillTableUsers(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
 	for i := 0; i < num_of_nodes; i++ {
 		user := models.User{
 			ID:        i,
@@ -46,10 +48,12 @@ VALUES ($1, $2, $3, $4, $5, $6, $7)
 		if err != nil {
 			log.Printf("filling table users error: %v", err)
 		}
+		ds.DatesOfRegistration = append(ds.DatesOfRegistration, user.DateOfReg)
+
 	}
 }
 
-func FillTableRestaurants(ctx context.Context, p *pgxpool.Pool) {
+func FillTableRestaurants(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
 	for i := 0; i < num_of_nodes; i++ {
 		restaurant := models.Restaurant{
 			ID:          i,
@@ -68,18 +72,22 @@ VALUES ($1, $2, $3, $4, $5, $6, $7)
 		if err != nil {
 			log.Printf("filling table restaurants error: %v", err)
 		}
+		ds.Restaurants = append(ds.Restaurants, restaurant)
+
 	}
 }
 
-func FillTableReviews(ctx context.Context, p *pgxpool.Pool) {
+func FillTableReviews(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
+	times := random.GenerateRandomReviewDate(ds.DatesOfRegistration)
 	for i := 0; i < num_of_nodes; i++ {
+		UID := gofakeit.Number(1, num_of_nodes-1)
 		review := models.Review{
 			ID:         i,
-			UID:        gofakeit.Number(1, num_of_nodes-1),
+			UID:        UID,
 			RID:        gofakeit.Number(1, num_of_nodes-1),
 			Rating:     gofakeit.Number(1, 5),
 			Comment:    gofakeit.Paragraph(1, 3, 10, " "),
-			ReviewDate: random.GenerateDateAfter2010(),
+			ReviewDate: times[UID],
 		}
 		query := `
 		INSERT INTO review (id, userid, restaurantid, rating, comment, review_date)
@@ -92,7 +100,7 @@ VALUES ($1, $2, $3, $4, $5, $6)
 	}
 }
 
-func FillTableRTables(ctx context.Context, p *pgxpool.Pool) {
+func FillTableRTables(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
 
 	for i := 0; i < num_of_nodes; i++ {
 		rtable := models.RTable{
@@ -111,19 +119,47 @@ VALUES ($1, $2, $3, $4, $5)
 		if err != nil {
 			log.Printf("filling table restauranttables error: %v", err)
 		}
+		ds.Tables = append(ds.Tables, rtable)
 	}
 }
 
-func FillTableOrders(ctx context.Context, p *pgxpool.Pool) {
+func FillTableMenus(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
+	count := 0
+	for _, restaurant := range ds.Restaurants {
+		for i := 0; i < 5; i++ {
+			menu := models.Menu{
+				ID:   count,
+				RID:  restaurant.ID,
+				Name: gofakeit.Company(),
+			}
+			query := `
+			INSERT INTO menus (id, restaurantid, name)
+			VALUES ($1, $2, $3)
+			`
+			_, err := p.Exec(ctx, query, menu.ID, menu.RID, menu.Name)
+			if err != nil {
+				log.Printf("filling table menu error: %v", err)
+			}
+
+			ds.Menus = append(ds.Menus, menu)
+			count++
+		}
+	}
+}
+
+func FillTableOrders(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
+	times := random.GenerateRandomOrderDate(ds.DatesOfRegistration)
 	for i := 0; i < num_of_nodes; i++ {
+		UID := gofakeit.Number(1, num_of_nodes-1)
+		TID := gofakeit.Number(1, num_of_nodes-1)
 		order := models.Order{
 			ID:          i,
-			UID:         gofakeit.Number(1, num_of_nodes-1),
-			RName:       gofakeit.Company(),
-			OrderDate:   random.GenerateDateAfter2010(),
+			UID:         UID,
+			RName:       random.DefinitionOfRestaurantName(ds, TID),
+			OrderDate:   times[UID],
 			Status:      gofakeit.RandomString([]string{"pending", "confirmed", "completed", "canceled"}),
 			TotalAmount: gofakeit.Number(20, 500),
-			TID:         gofakeit.Number(1, num_of_nodes-1),
+			TID:         TID,
 		}
 		query := `
 		INSERT INTO orders (id, userid, restaurant_name, order_date_time, order_status, total_amount, tableid)
@@ -133,56 +169,44 @@ VALUES ($1, $2, $3, $4, $5, $6, $7)
 		if err != nil {
 			log.Printf("filling table orders error: %v", err)
 		}
+		ds.Orders = append(ds.Orders, order)
 	}
 }
 
-func FillTableMenus(ctx context.Context, p *pgxpool.Pool) {
-	for i := 0; i < num_of_nodes; i++ {
-		menu := models.Menu{
-			ID:   i,
-			RID:  gofakeit.Number(1, num_of_nodes-1),
-			Name: gofakeit.Company(),
-		}
+func FillTableDishes(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
+	count := 0
+	for _, menu := range ds.Menus {
+		for i := 0; i < 5; i++ {
+			dish := models.Dish{
+				ID:           count,
+				MID:          menu.ID,
+				DishName:     gofakeit.MinecraftFood(),
+				DishDesc:     gofakeit.Sentence(5),
+				Price:        gofakeit.Number(5, 100),
+				Availability: gofakeit.Bool(),
+			}
 
-		query := `
-		INSERT INTO menus (id, restaurantid, name)
-VALUES ($1, $2, $3)
-`
-		_, err := p.Exec(ctx, query, menu.ID, menu.RID, menu.Name)
-		if err != nil {
-			log.Printf("filling table menu error: %v", err)
-		}
-	}
-}
-
-func FillTableDishes(ctx context.Context, p *pgxpool.Pool) {
-	for i := 0; i < num_of_nodes; i++ {
-		dish := models.Dish{
-			ID:           i,
-			MID:          gofakeit.Number(1, num_of_nodes-1),
-			DishName:     gofakeit.MinecraftFood(),
-			DishDesc:     gofakeit.Sentence(5),
-			Price:        gofakeit.Number(5, 100),
-			Availability: gofakeit.Bool(),
-		}
-
-		query := `
-		INSERT INTO dish (id, menuid, dish_name, dish_description, price, availability)
-VALUES ($1, $2, $3, $4, $5, $6)
-`
-		_, err := p.Exec(ctx, query, dish.ID, dish.MID, dish.DishName, dish.DishDesc, dish.Price, dish.Availability)
-		if err != nil {
-			log.Printf("filling table dish error: %v", err)
+			query := `
+			INSERT INTO dish (id, menuid, dish_name, dish_description, price, availability)
+			VALUES ($1, $2, $3, $4, $5, $6)
+			`
+			_, err := p.Exec(ctx, query, dish.ID, dish.MID, dish.DishName, dish.DishDesc, dish.Price, dish.Availability)
+			if err != nil {
+				log.Printf("filling table dish error: %v", err)
+			}
+			count++
 		}
 	}
 }
 
-func FillTableOrderDish(ctx context.Context, p *pgxpool.Pool) {
+func FillTableOrderDish(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
 	for i := 0; i < num_of_nodes; i++ {
+		OID := gofakeit.Number(1, num_of_nodes-1)
+		DID := random.RandomDishIDForOrderDishTable(ctx, ds, OID, p)
 		orderDish := models.OrderDish{
 			ID:       i,
-			OID:      gofakeit.Number(1, num_of_nodes-1),
-			DID:      gofakeit.Number(1, num_of_nodes-1),
+			OID:      OID,
+			DID:      DID,
 			Quantity: gofakeit.Number(1, 5),
 		}
 

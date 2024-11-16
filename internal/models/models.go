@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 //all models for our db
 
@@ -60,7 +62,7 @@ type OrderDish struct {
 
 type Menu struct {
 	ID   int    `db:"id"`
-	RID  int    `db:"rastaurantid"`
+	RID  int    `db:"restaurantid"`
 	Name string `db:"name"`
 }
 
@@ -71,4 +73,13 @@ type Dish struct {
 	DishDesc     string `db:"dish_description"`
 	Price        int    `db:"price"`
 	Availability bool   `db:"availability"`
+}
+
+type DataSet struct {
+	DatesOfRegistration []time.Time
+	Orders              []Order
+	Restaurants         []Restaurant
+	Tables              []RTable
+	Menus               []Menu
+	Dish                []Dish
 }

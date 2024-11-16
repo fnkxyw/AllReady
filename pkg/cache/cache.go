@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -27,6 +28,7 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 	defer c.mu.Unlock()
 
 	value, found := c.items[key]
+
 	return value, found
 }
 
@@ -48,4 +50,13 @@ func (c *Cache[K, V]) Pop(key K) (V, bool) {
 	}
 
 	return value, found
+}
+
+func (c *Cache[K, V]) Print() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	for key, value := range c.items {
+		fmt.Printf("Key: %v, Value: %v\n", key, value)
+	}
 }
