@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+//func for generating correct date
+
 func GenerateDateAfter2010() time.Time {
 	year := gofakeit.Number(2011, 2024)
 

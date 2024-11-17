@@ -9,6 +9,8 @@ import (
 	"math/rand"
 )
 
+//func for correct dish pick
+
 func RandomDishIDForOrderDishTable(ctx context.Context, ds *models.DataSet, OID int, pr *pgxpool.Pool) int {
 	temp := ds.Tables[ds.Orders[OID].TID]
 	rest := ds.Restaurants[temp.RID]

@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// func for generate correct order date
+
 func GenerateRandomOrderDate(times []time.Time) []time.Time {
 	now := time.Now()
 

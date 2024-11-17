@@ -2,6 +2,8 @@ package random
 
 import "math/rand"
 
+//func for random location generating
+
 func GenerateRandomLocation() string {
 	locations := []string{
 		"Table #1 (Window side)",

@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// func for generate review order date
+
 func GenerateRandomReviewDate(times []time.Time) []time.Time {
 	now := time.Now()
 
