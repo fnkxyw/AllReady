@@ -13,6 +13,8 @@ Restaurant for example - Govini
 ``SELECT dish_name, price FROM dish WHERE availability = true ORDER BY price DESC;``
 ![img_4.png](img_4.png) ![img_5.png](img_5.png)
 
+Explain after dish_price index usage -> ![img_26.png](img_26.png)
+
 4.List all users who registered in the last 30 days and have not placed an order yet
 ``SELECT u.first_name, u.last_name, u.email, u.date_of_registration FROM users u LEFT JOIN orders o ON u.id = o.userid WHERE u.date_of_registration >= CURRENT_DATE - INTERVAL '30 days' AND o.id IS NULL;``
 ![img_7.png](img_7.png)   ![img_6.png](img_6.png)
@@ -24,7 +26,10 @@ Restaurant for example - Govini
 
 2.Get the average rating for each restaurant
 ``SELECT r.name, AVG(rv.rating) as avg_rating FROM restaurants r JOIN review rv ON r.id = rv.restaurantid GROUP BY r.id, r.name;``
-![img_10.png](img_10.png) ![img_11.png](img_11.png)
+
+![img_10.png](img_10.png) ![img_11.png](img_11.png) 
+
+Explain after adding rest_index -> ![img_25.png](img_25.png)
 
 3.List all orders with their associated dishes
 ``SELECT o.id, o.restaurant_name, d.dish_name, od.quantity FROM orders o JOIN order_dish od ON o.id = od.orderid JOIN dish d ON od.dishid = d.id;``
@@ -58,6 +63,8 @@ FROM restaurants r
          JOIN dish_counts dc ON r.id = dc.restaurant_id
 WHERE dc.rn = 1;``
 ![img_16.png](img_16.png)  ![img_17.png](img_17.png)
+
+Explain after add dish_index -> ![img_24.png](img_24.png)
 
 2.Find the busiest hour for each day of the week, based on order volume
 ``WITH hourly_orders AS (

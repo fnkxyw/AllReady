@@ -15,5 +15,5 @@
 ### Hard Level
 * Find the most popular dish for each restaurant
 * Find the busiest hour for each day of the week, based on order volume
-* Identify ‘seasonal’ dishes - those that are ordered significantly more often at certain times of the year
-* Rank restaurants by their average rating, but only consider reviews from users who have ordered from at least 3 different restaurants
+* Calculate the average order amount and the number of orders for each user, but only for users who have placed orders at restaurants with a rating higher than 4
+* Identifying "seasonal" dishes that are ordered significantly more frequently during the year.

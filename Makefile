@@ -11,6 +11,7 @@ goose-up:
 	goose -dir ./migrations postgres $(DSN) up-by-one
 	goose -dir ./migrations postgres $(DSN) up-by-one
 	goose -dir ./migrations postgres $(DSN) up-by-one
+	goose -dir ./migrations postgres $(DSN) up-by-one
 
 # down all migrations
 goose-down:
