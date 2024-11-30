@@ -11,7 +11,7 @@ import (
 
 //file with functions for filling tables / gofakeit
 
-const num_of_nodes = 1000
+const num_of_nodes = 10000
 
 //method for filling all tables in db
 
@@ -102,10 +102,10 @@ VALUES ($1, $2, $3, $4, $5, $6)
 
 func FillTableRTables(ctx context.Context, p *pgxpool.Pool, ds *models.DataSet) {
 
-	for i := 0; i < num_of_nodes; i++ {
+	for i := 0; i < num_of_nodes*5; i++ {
 		rtable := models.RTable{
 			ID:           i,
-			RID:          gofakeit.Number(1, num_of_nodes-12),
+			RID:          gofakeit.Number(1, num_of_nodes-1),
 			Seats:        gofakeit.Number(2, 10),
 			Availability: gofakeit.Bool(),
 			Location:     random.GenerateRandomLocation(),
