@@ -128,7 +128,7 @@ HAVING COUNT(o.id) > 0
 ORDER BY order_count DESC;``
 ![img_20.png](img_20.png) ![img_21.png](img_21.png)
 
-4.Identifying "seasonal" dishes that are ordered significantly more frequently during the year.
+4.Analyses restaurant ratings by comparing their overall average rating to their recent average rating
 ``WITH overall_avg AS (
     SELECT restaurantid, AVG(rating) AS avg_rating
     FROM review
