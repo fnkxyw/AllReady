@@ -27,7 +27,7 @@ ORDER BY price DESC;``
 
 Explain after dish_price index usage -> ![img_26.png](img_26.png)
 
-4.List all users who registered in the last 30 days and have not placed an order yet
+4.List all users who registered in the last 30 days and have not orders 
 ``SELECT u.first_name, u.last_name, u.email, u.date_of_registration 
 FROM users u 
 LEFT JOIN orders o ON u.id = o.userid 
@@ -60,12 +60,20 @@ JOIN order_dish od ON o.id = od.orderid
 JOIN dish d ON od.dishid = d.id;``
 ![img_12.png](img_12.png) ![img_13.png](img_13.png)
 
-4.Find users who have made more than 4 orders
-``SELECT u.first_name, u.last_name, COUNT(o.id) as order_count 
-FROM users u 
-JOIN orders o ON u.id = o.userid 
-GROUP BY u.id, u.first_name, u.last_name 
-HAVING COUNT(o.id) > 4;``
+4.Find users who have left reviews for all the restaurants they have ordered from
+``SELECT u.id, u.first_name, u.last_name
+FROM users u
+WHERE NOT EXISTS (
+    SELECT DISTINCT o.restaurant_name
+    FROM orders o
+    WHERE o.userid = u.id
+    EXCEPT
+    SELECT r.name
+    FROM review rv
+    JOIN restaurants r ON rv.restaurantid = r.id
+    WHERE rv.userid = u.id
+)
+AND EXISTS (SELECT 1 FROM orders o WHERE o.userid = u.id);``
 ![img_14.png](img_14.png) ![img_15.png](img_15.png)
 
 # Hard Level
@@ -97,20 +105,28 @@ Explain after add dish_index -> ![img_24.png](img_24.png)
 
 2.Find the busiest hour for each day of the week, based on order volume
 ``WITH hourly_orders AS (
-  SELECT 
-    DATE_TRUNC('hour', order_date_time) AS order_hour,
-    EXTRACT(DOW FROM order_date_time) AS day_of_week,
-    COUNT(*) AS order_count,
-    RANK() OVER (PARTITION BY EXTRACT(DOW FROM order_date_time) 
-                 ORDER BY COUNT(*) DESC) AS hour_rank
-  FROM orders
-  GROUP BY DATE_TRUNC('hour', order_date_time), EXTRACT(DOW FROM order_date_time)
+    SELECT
+        EXTRACT(DOW FROM order_date_time) AS day_of_week,
+        EXTRACT(HOUR FROM order_date_time) AS hour,
+        COUNT(*) AS order_count
+    FROM orders
+    GROUP BY 
+        EXTRACT(DOW FROM order_date_time),
+        EXTRACT(HOUR FROM order_date_time)
+),
+ranked_hours AS (
+    SELECT
+        day_of_week,
+        hour,
+        order_count,
+        RANK() OVER (PARTITION BY day_of_week ORDER BY order_count DESC) AS hour_rank
+    FROM hourly_orders
 )
-SELECT 
-  day_of_week,
-  TO_CHAR(order_hour, 'HH24:MI') AS busiest_hour,
-  order_count
-FROM hourly_orders
+SELECT
+    day_of_week,
+    LPAD(hour::text, 2, '0') || ':00' AS busiest_hour,
+    order_count
+FROM ranked_hours
 WHERE hour_rank = 1
 ORDER BY day_of_week;``
 ![img_18.png](img_18.png) ![img_19.png](img_19.png)

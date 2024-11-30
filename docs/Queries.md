@@ -16,4 +16,4 @@
 * Find the most popular dish for each restaurant
 * Find the busiest hour for each day of the week, based on order volume
 * Calculate the average order amount and the number of orders for each user, but only for users who have placed orders at restaurants with a rating higher than 4
-* Identifying "seasonal" dishes that are ordered significantly more frequently during the year.
+* Analyses restaurant ratings by comparing their overall average rating to their recent average rating
