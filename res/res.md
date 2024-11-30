@@ -1,42 +1,71 @@
 # Easy Level
 1.List all restaurants with a rating above 4, sorted by their name
 
-``SELECT name, rating, address FROM restaurants WHERE rating > 4 ORDER BY name;``
+``SELECT name, rating, address 
+FROM restaurants 
+WHERE rating > 4 
+ORDER BY name;``
 ![img.png](img.png) ![img_1.png](img_1.png)
 
-2.Find all available tables with more than 3 seats in a specific restaurant
+2.Find all available tables with more than 4 seats in a specific restaurant
 Restaurant for example - Govini
-``SELECT rt.id, rt.seats, rt.location, r.address FROM restauranttables rt JOIN restaurants r ON rt.restaurantid = r.id WHERE rt.availability = true  AND rt.seats > 4  AND r.name = 'Govini' ORDER BY  r.address;``
+``SELECT rt.id, rt.seats, rt.location, r.address 
+FROM restauranttables rt 
+JOIN restaurants r ON rt.restaurantid = r.id 
+WHERE rt.availability = true 
+  AND rt.seats > 4 
+  AND r.name = 'Govini' 
+ORDER BY r.address;``
 ![img_2.png](img_2.png) ![img_3.png](img_3.png)
 
 3.Get the names and prices of all dishes that are currently available, ordered by price
-``SELECT dish_name, price FROM dish WHERE availability = true ORDER BY price DESC;``
+``SELECT dish_name, price 
+FROM dish 
+WHERE availability = true 
+ORDER BY price DESC;``
 ![img_4.png](img_4.png) ![img_5.png](img_5.png)
 
 Explain after dish_price index usage -> ![img_26.png](img_26.png)
 
 4.List all users who registered in the last 30 days and have not placed an order yet
-``SELECT u.first_name, u.last_name, u.email, u.date_of_registration FROM users u LEFT JOIN orders o ON u.id = o.userid WHERE u.date_of_registration >= CURRENT_DATE - INTERVAL '30 days' AND o.id IS NULL;``
+``SELECT u.first_name, u.last_name, u.email, u.date_of_registration 
+FROM users u 
+LEFT JOIN orders o ON u.id = o.userid 
+WHERE u.date_of_registration >= CURRENT_DATE - INTERVAL '30 days' 
+  AND o.id IS NULL;``
 ![img_7.png](img_7.png)   ![img_6.png](img_6.png)
 
 # Medium Level
 1.Find the top 5 highest-rated restaurants
-``SELECT name, rating FROM restaurants ORDER BY rating DESC LIMIT 5;``
+``SELECT name, rating 
+FROM restaurants 
+ORDER BY rating DESC 
+LIMIT 5;``
 ![img_8.png](img_8.png) ![img_9.png](img_9.png)
 
 2.Get the average rating for each restaurant
-``SELECT r.name, AVG(rv.rating) as avg_rating FROM restaurants r JOIN review rv ON r.id = rv.restaurantid GROUP BY r.id, r.name;``
+``SELECT r.name, AVG(rv.rating) as avg_rating 
+FROM restaurants r 
+JOIN review rv ON r.id = rv.restaurantid 
+GROUP BY r.id, r.name;``
 
 ![img_10.png](img_10.png) ![img_11.png](img_11.png) 
 
 Explain after adding rest_index -> ![img_25.png](img_25.png)
 
 3.List all orders with their associated dishes
-``SELECT o.id, o.restaurant_name, d.dish_name, od.quantity FROM orders o JOIN order_dish od ON o.id = od.orderid JOIN dish d ON od.dishid = d.id;``
+``SELECT o.id, o.restaurant_name, d.dish_name, od.quantity 
+FROM orders o 
+JOIN order_dish od ON o.id = od.orderid 
+JOIN dish d ON od.dishid = d.id;``
 ![img_12.png](img_12.png) ![img_13.png](img_13.png)
 
 4.Find users who have made more than 4 orders
-``SELECT u.first_name, u.last_name, COUNT(o.id) as order_count FROM users u JOIN orders o ON u.id = o.userid GROUP BY u.id, u.first_name, u.last_name HAVING COUNT(o.id) > 4``
+``SELECT u.first_name, u.last_name, COUNT(o.id) as order_count 
+FROM users u 
+JOIN orders o ON u.id = o.userid 
+GROUP BY u.id, u.first_name, u.last_name 
+HAVING COUNT(o.id) > 4;``
 ![img_14.png](img_14.png) ![img_15.png](img_15.png)
 
 # Hard Level
